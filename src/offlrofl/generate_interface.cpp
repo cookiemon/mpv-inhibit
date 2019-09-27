@@ -204,7 +204,8 @@ std::string generate_method_code(const pugi::xml_node& method) {
       if (!return_type.empty()) {
         fmt::print(stderr, "Found multiple return arguments in method '{}'",
                    method_name);
-        return fmt::format("  // {method} skipped. Multiple return values.\n");
+        return fmt::format("  // {method} skipped. Multiple return values.\n",
+                           fmt::arg("method", method_name));
       }
 
       return_type = *arg_type;
