@@ -59,3 +59,7 @@ target_include_directories(mpv-inhibit PRIVATE ${MPV_INCLUDE_DIR})
 find_package(fmt CONFIG REQUIRED)
 target_link_libraries(mpv-inhibit fmt::fmt)
 
+set(THREADS_PREFER_PTHREAD_FLAG YES)
+find_package(Threads REQUIRED)
+target_link_libraries(mpv-inhibit Threads::Threads)
+
