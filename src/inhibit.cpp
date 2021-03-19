@@ -3,6 +3,7 @@
 #include <fmt/format.h>
 #include <mpv/client.h>
 
+#include <pthread.h>
 #include <string_view>
 #if defined(WIN32)
 #define WIN32_LEAN_AND_MEAN

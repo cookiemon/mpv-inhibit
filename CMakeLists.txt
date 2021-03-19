@@ -50,7 +50,7 @@ target_include_directories(mpv-inhibit PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(mpv-inhibit offlrofl::offlrofl)
 
-find_file(MPV_INCLUDE_DIR mpv/client.h)
+find_path(MPV_INCLUDE_DIR mpv/client.h)
 if(NOT MPV_INCLUDE_DIR)
 	message(FATAL_ERROR "Cannot find libmpv headers. Are you missing a libmpv-dev package?")
 endif()
