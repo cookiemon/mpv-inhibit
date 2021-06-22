@@ -1,9 +1,6 @@
 ---
-Checks: '*,-google-*,-fuchsia-*,-cert-*,-hicpp-*,-llvm-namespace-comment,-llvm-header-guard,-cppcoreguidelines-pro-bounds-pointer-arithmetic'
-CheckOptions:    
-  - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
-    value:           '1'
-  - key: misc-throw-by-value-catch-by-reference.CheckThrowTemporaries
-    value:           '0'
-...
-
+Checks:          'bugprone-*,clang-diagnostic-*,clang-analyzer-*,modernize-*,readability-*'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle:     none
