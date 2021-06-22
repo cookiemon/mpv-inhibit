@@ -85,9 +85,9 @@ auto mpv_open_cplugin(mpv_handle* handle) -> int {
           if (data->format == MPV_FORMAT_FLAG && data->data != nullptr) {
             int flag = *static_cast<int*>(data->data);
             if (flag != 0) {
-              unpause(screen_saver, cookie);
-            } else {
               pause(screen_saver, cookie);
+            } else {
+              unpause(screen_saver, cookie);
             }
           }
         }
