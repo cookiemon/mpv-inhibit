@@ -7,7 +7,7 @@ message::message(message&& other) noexcept : msg{other.msg} {
   other.msg = nullptr;
 }
 
-message& message::operator=(message&& other) noexcept {
+auto message::operator=(message&& other) noexcept -> message& {
   std::swap(msg, other.msg);
 
   return *this;
@@ -21,7 +21,7 @@ message::~message() {
 
 message::message(DBusMessage* initMsg) : msg{initMsg} {}
 
-message message::wrap(DBusMessage* msg) {
+auto message::wrap(DBusMessage* msg) -> message {
   return message{msg};
 }
 

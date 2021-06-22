@@ -13,10 +13,10 @@ namespace offlrofl {
 class message {
 public:
   message(const message&) = delete;
-  message& operator=(const message&) = delete;
+  auto operator=(const message&) -> message& = delete;
 
   message(message&& other) noexcept;
-  message& operator=(message&& other) noexcept;
+  auto operator=(message&& other) noexcept -> message&;
 
   ~message();
 
@@ -28,24 +28,24 @@ public:
    * you should call ref on the message before passing it to this
    * function.
    */
-  [[nodiscard]] static message wrap(DBusMessage* msg);
+  [[nodiscard]] static auto wrap(DBusMessage* msg) -> message;
 
   /**
    * Create a message that specifies a method call on an interface.
    */
   template <typename... Args>
-  [[nodiscard]] static message method_call(const char* destination,
-                                           const char* path,
-                                           const char* iface,
-                                           const char* method,
-                                           Args&... args);
+  [[nodiscard]] static auto method_call(const char* destination,
+                                        const char* path,
+                                        const char* iface,
+                                        const char* method,
+                                        Args&... args) -> message;
 
   /**
    * Returns the first argument of the message. Currently only supports
    * basic dbus types, i.e. only `intX_t` and `const char*`.
    */
   template <typename T>
-  [[nodiscard]] T get_argument();
+  [[nodiscard]] auto get_argument() -> T;
 
   operator DBusMessage*();
 
@@ -58,39 +58,39 @@ private:
 // IMPLEMENTATION DETAILS, PLEASE CLOSE YOUR EYES!
 ////////////////////////////////////////////////////////////////////////
 namespace detail {
-inline int message_arg_type(const char* /*unused*/) {
+inline auto message_arg_type(const char* /*unused*/) -> int {
   return DBUS_TYPE_STRING;
 }
 
-inline int message_arg_type(uint8_t /*unused*/) {
+inline auto message_arg_type(uint8_t /*unused*/) -> int {
   return DBUS_TYPE_BYTE;
 }
 
-inline int message_arg_type(bool /*unused*/) {
+inline auto message_arg_type(bool /*unused*/) -> int {
   return DBUS_TYPE_BOOLEAN;
 }
 
-inline int message_arg_type(uint16_t /*unused*/) {
+inline auto message_arg_type(uint16_t /*unused*/) -> int {
   return DBUS_TYPE_UINT16;
 }
 
-inline int message_arg_type(int16_t /*unused*/) {
+inline auto message_arg_type(int16_t /*unused*/) -> int {
   return DBUS_TYPE_INT16;
 }
 
-inline int message_arg_type(uint32_t /*unused*/) {
+inline auto message_arg_type(uint32_t /*unused*/) -> int {
   return DBUS_TYPE_UINT32;
 }
 
-inline int message_arg_type(int32_t /*unused*/) {
+inline auto message_arg_type(int32_t /*unused*/) -> int {
   return DBUS_TYPE_INT32;
 }
 
-inline int message_arg_type(uint64_t /*unused*/) {
+inline auto message_arg_type(uint64_t /*unused*/) -> int {
   return DBUS_TYPE_UINT64;
 }
 
-inline int message_arg_type(int64_t /*unused*/) {
+inline auto message_arg_type(int64_t /*unused*/) -> int {
   return DBUS_TYPE_INT64;
 }
 
@@ -110,11 +110,11 @@ inline void append_arguments(DBusMessageIter& iter,
 }
 
 template <typename... Args>
-message message::method_call(const char* destination,
-                             const char* path,
-                             const char* iface,
-                             const char* method,
-                             Args&... args) {
+auto message::method_call(const char* destination,
+                          const char* path,
+                          const char* iface,
+                          const char* method,
+                          Args&... args) -> message {
   assert(destination);
   assert(path);
   assert(iface);
@@ -131,7 +131,7 @@ message message::method_call(const char* destination,
 }
 
 template <typename T>
-T message::get_argument() {
+auto message::get_argument() -> T {
   DBusMessageIter iter;
   dbus_message_iter_init(*this, &iter);
 

@@ -9,7 +9,7 @@ extern "C" {
 }
 
 namespace offlrofl {
-connection connection::session() {
+auto connection::session() -> connection {
   error err;
   dbus_error_init(err);
 
@@ -19,7 +19,7 @@ connection connection::session() {
   return connection{conn};
 }
 
-connection connection::system() {
+auto connection::system() -> connection {
   error err;
   dbus_error_init(err);
 
@@ -33,21 +33,21 @@ connection::connection(connection&& other) noexcept : conn{other.conn} {
   other.conn = nullptr;
 }
 
-connection& connection::operator=(connection&& other) noexcept {
+auto connection::operator=(connection&& other) noexcept -> connection& {
   std::swap(conn, other.conn);
 
   return *this;
 }
 
 connection::~connection() {
-  if (conn) {
+  if (conn != nullptr) {
     dbus_connection_unref(conn);
   }
 }
 
-message connection::send_with_reply(DBusMessage* msg) {
+auto connection::send_with_reply(DBusMessage* msg) -> message {
   error err;
-  auto reply = dbus_connection_send_with_reply_and_block(*this, msg, -1, err);
+  auto* reply = dbus_connection_send_with_reply_and_block(*this, msg, -1, err);
   err.throw_if_error();
 
   return message::wrap(reply);

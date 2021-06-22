@@ -14,24 +14,24 @@ public:
   /**
    * Return a connection to the session bus.
    */
-  static connection session();
+  static auto session() -> connection;
   /**
    * Return a connection to the system bus.
    */
-  static connection system();
+  static auto system() -> connection;
 
   connection(connection& other) = delete;
-  connection& operator=(connection& other) = delete;
+  auto operator=(connection& other) -> connection& = delete;
 
   connection(connection&& other) noexcept;
-  connection& operator=(connection&& other) noexcept;
+  auto operator=(connection&& other) noexcept -> connection&;
 
   ~connection();
 
   /**
    * Send a message over the dbus and block until a reply was received.
    */
-  message send_with_reply(DBusMessage* msg);
+  auto send_with_reply(DBusMessage* msg) -> message;
 
   operator DBusConnection*();
 

@@ -32,9 +32,9 @@ public:
 
 {methods}
 
-  [[nodiscard]] const char* get_destination() const {{ return destination; }}
-  [[nodiscard]] const char* get_path() const {{ return path; }}
-  [[nodiscard]] const char* get_interface() const {{ return iface; }}
+  [[nodiscard]] auto get_destination() const -> const char* {{ return destination; }}
+  [[nodiscard]] auto get_path() const -> const char* {{ return path; }}
+  [[nodiscard]] static auto get_interface() -> const char* {{ return iface; }}
 
 private:
   offlrofl::connection conn = offlrofl::connection::session();
@@ -44,7 +44,7 @@ private:
   static inline const char* iface = "{interface}";
 
   template <typename ReturnType, typename... Args>
-  ReturnType call(const char* name, Args... args) {{
+  auto call(const char* name, Args... args) -> ReturnType {{
     // The allocated character array is only valid as long as the
     // message is allocated which gets unreferenced at the end of this
     // method. So strings must be copied and returned instead.
@@ -79,21 +79,23 @@ public:
                                       const char* init_path)
       : destination{init_destination}, path{init_path} {}
 
-  std::string Introspect() { return call<std::string>("Introspect"); }
+  auto Introspect() -> std::string { return call<std::string>("Introspect"); }
 
-  [[nodiscard]] const char* get_destination() const { return destination; }
-  [[nodiscard]] const char* get_path() const { return path; }
-  [[nodiscard]] const char* get_interface() const { return iface; }
+  [[nodiscard]] auto get_destination() const -> const char* {
+    return destination;
+  }
+  [[nodiscard]] auto get_path() const -> const char* { return path; }
+  [[nodiscard]] static auto get_interface() -> const char* { return iface; }
 
 private:
   offlrofl::connection conn = offlrofl::connection::session();
 
   const char* destination = "org.freedesktop.ScreenSaver";
   const char* path = "/org/freedesktop/ScreenSaver";
-  static inline const char* iface = "org.freedesktop.DBus.Introspectable";
+  static inline const char* const iface = "org.freedesktop.DBus.Introspectable";
 
   template <typename ReturnType, typename... Args>
-  ReturnType call(const char* name, Args... args) {
+  auto call(const char* name, Args... args) -> ReturnType {
     // The allocated character array is only valid as long as the
     // message is allocated which gets unreferenced at the end of this
     // method. So strings must be copied and returned instead.
@@ -124,8 +126,8 @@ void replace(std::string& str, char needle, char with) {
       with);
 }
 
-std::string retrieve_introspect_xml(const std::string& destination,
-                                    const std::string& path) {
+auto retrieve_introspect_xml(const std::string& destination,
+                             const std::string& path) -> std::string {
   auto object =
       org_freedesktop_DBus_Introspectable{destination.c_str(), path.c_str()};
 
@@ -136,7 +138,7 @@ std::string retrieve_introspect_xml(const std::string& destination,
  * Transform the single char literals of dbus argument types to c++
  * types.
  */
-std::optional<std::string> translate_arg_type(const std::string& arg) {
+auto translate_arg_type(const std::string& arg) -> std::optional<std::string> {
   // 0 is invalid anyway so use that if arg looks wrong
   char type_char = arg.size() == 1 ? arg[0] : '\0';
   switch (type_char) {
@@ -163,7 +165,7 @@ std::optional<std::string> translate_arg_type(const std::string& arg) {
  * Generate code for the synchronous function call for the method
  * specified by the given xml node.
  */
-std::string generate_method_code(const pugi::xml_node& method) {
+auto generate_method_code(const pugi::xml_node& method) -> std::string {
   std::string return_type;
   std::string arguments;
   std::string typed_arguments;
@@ -185,7 +187,7 @@ std::string generate_method_code(const pugi::xml_node& method) {
           fmt::arg("method", method_name), fmt::arg("type", arg_dbus_type));
     }
 
-    auto arg_direction = arg.attribute("direction").value();
+    const auto* arg_direction = arg.attribute("direction").value();
     if (arg_direction == "in"sv) {
       // Arguments will be a list appended after the name parameter so
       // it allways needs to be prepended with a komma.
@@ -205,8 +207,7 @@ std::string generate_method_code(const pugi::xml_node& method) {
       if (!return_type.empty()) {
         fmt::print(stderr, "Found multiple return arguments in method '{}'",
                    method_name);
-        return fmt::format("  // {method} skipped. Multiple return values.\n",
-                           fmt::arg("method", method_name));
+        return fmt::format("  // {method} skipped. Multiple return values.\n");
       }
 
       return_type = *arg_type;
@@ -237,9 +238,9 @@ std::string generate_method_code(const pugi::xml_node& method) {
   // clang-format on
 }
 
-std::string generate_source_code(const std::string& interface_description,
-                                 const std::string& destination,
-                                 const std::string& path) {
+auto generate_source_code(const std::string& interface_description,
+                          const std::string& destination,
+                          const std::string& path) -> std::string {
   pugi::xml_document doc;
   pugi::xml_parse_result res = doc.load_string(interface_description.c_str());
   if (!res) {
@@ -269,10 +270,10 @@ std::string generate_source_code(const std::string& interface_description,
   return code;
 }
 
-int main(int argc, const char** argv) {
+auto main(int argc, const char** argv) -> int {
   try {
     if (argc < 2) {
-      auto name = argc < 1 ? "generate_interface" : argv[0];
+      const auto* name = argc < 1 ? "generate_interface" : argv[0];
       fmt::print(stderr,
                  "Usage: {} object-destination\n"
                  "object-destination may either be a path or a destination. "

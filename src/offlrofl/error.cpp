@@ -1,5 +1,6 @@
 #include <offlrofl/error.h>
 
+#include <memory>
 #include <stdexcept>
 
 extern "C" {
@@ -8,21 +9,22 @@ extern "C" {
 
 namespace offlrofl {
 error::error() {
-  err = std::shared_ptr<DBusError>{new DBusError{}, [](DBusError* err) {
-                                     // assumption: can free invalid but
-                                     // initialized DBusError
-                                     dbus_error_free(err);
-                                     delete err;
-                                   }};
+  err = std::make_unique<DBusError>();
 
   dbus_error_init(*this);
 }
 
-bool error::is_ok() const {
+error::~error() {
+  if (err != nullptr) {
+    dbus_error_free(*this);
+  }
+}
+
+auto error::is_ok() const -> bool {
   return !is_error();
 }
 
-bool error::is_error() const {
+auto error::is_error() const -> bool {
   return dbus_error_is_set(*this) != 0;
 }
 
@@ -32,7 +34,7 @@ void error::throw_if_error() const {
   }
 }
 
-const char* error::message() const noexcept {
+auto error::message() const noexcept -> const char* {
   return err->message != nullptr ? err->message : "";
 }
 

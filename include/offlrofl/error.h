@@ -18,14 +18,20 @@ public:
    */
   error();
 
+  error(const error&) = delete;
+  error(error&&) = default;
+  auto operator=(const error&) -> error& = delete;
+  auto operator=(error&&) -> error& = default;
+  ~error();
+
   /**
    * Check whether no error happened.
    */
-  [[nodiscard]] bool is_ok() const;
+  [[nodiscard]] auto is_ok() const -> bool;
   /**
    * Check whether an error happened.
    */
-  [[nodiscard]] bool is_error() const;
+  [[nodiscard]] auto is_error() const -> bool;
 
   /**
    * Throw this instance if it contains an error.
@@ -36,7 +42,7 @@ public:
    * Returns the error message (or empty string if no message is
    * available).
    */
-  [[nodiscard]] const char* message() const noexcept;
+  [[nodiscard]] auto message() const noexcept -> const char*;
 
   /**
    * Allow the error instance to be used for dbus functions.
@@ -49,6 +55,6 @@ public:
   operator const DBusError*() const;
 
 private:
-  std::shared_ptr<DBusError> err;
+  std::unique_ptr<DBusError> err;
 };
 }
